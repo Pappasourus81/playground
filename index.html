@@ -3,169 +3,51 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Python Playground (Year 9)</title>
-
-  <!-- Pyodide (Python in the browser) -->
+  <title>Python Sandbox</title>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-
   <style>
     :root{
-      --bg:#070b16;
-      --panel:#0c1430;
-      --panel2:#0a1026;
-      --text:#d6ecff;
-      --muted:#93b6d3;
-      --cyan:#00f3ff;
-      --amber:#ffae00;
-      --green:#00ff7a;
-      --red:#ff2b6a;
-      --radius:18px;
+      --bg:#070b16; --panel:#0c1430; --text:#d6ecff; --muted:#93b6d3;
+      --cyan:#00f3ff; --green:#00ff7a; --red:#ff2b6a;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
       --ui: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      --radius:16px;
     }
-
     body{
-      margin:0;
-      background:
-        radial-gradient(900px 600px at 15% 10%, rgba(0,243,255,0.18), transparent 55%),
-        radial-gradient(900px 700px at 85% 20%, rgba(255,174,0,0.12), transparent 60%),
-        linear-gradient(180deg, #050816 0%, var(--bg) 60%, #050816 100%);
-      color:var(--text);
-      font-family:var(--ui);
-      padding:18px;
+      margin:0; padding:18px; color:var(--text); font-family:var(--ui);
+      background: radial-gradient(900px 600px at 15% 10%, rgba(0,243,255,0.16), transparent 55%),
+                  linear-gradient(180deg, #050816 0%, var(--bg) 70%, #050816 100%);
     }
-
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap:14px;
-    }
-
+    .wrap{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .card{
-      background:linear-gradient(180deg, rgba(12,20,48,0.92), rgba(10,16,38,0.92));
+      background:rgba(12,20,48,0.9);
       border:1px solid rgba(0,243,255,0.18);
       border-radius:var(--radius);
-      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+      box-shadow:0 10px 28px rgba(0,0,0,0.35);
       overflow:hidden;
     }
-
-    .head{
-      padding:14px 16px;
-      border-bottom:1px solid rgba(0,243,255,0.12);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .title{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-
-    h1{
-      margin:0;
-      font-size:16px;
-      letter-spacing:0.6px;
-      font-weight:800;
-    }
-
-    .sub{
-      margin:0;
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .badge{
-      font-family:var(--mono);
-      font-size:11px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(0,243,255,0.12);
-      border:1px solid rgba(0,243,255,0.18);
-      color:var(--text);
-      white-space:nowrap;
-    }
-
-    .body{
-      padding:14px 16px 16px;
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-bottom:12px;
-    }
-
-    select, button{
-      border-radius:12px;
-      border:1px solid rgba(0,243,255,0.18);
-      background:rgba(8,14,30,0.7);
-      color:var(--text);
-      padding:10px 12px;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    button{
-      transition: transform 0.05s ease, background 0.2s ease, border-color 0.2s ease;
-    }
-    button:active{ transform: translateY(1px); }
-
-    .btn-run{ border-color: rgba(0,255,122,0.35); background: rgba(0,255,122,0.10); }
-    .btn-run:hover{ background: rgba(0,255,122,0.16); }
-
-    .btn-warn{ border-color: rgba(255,174,0,0.35); background: rgba(255,174,0,0.10); }
-    .btn-warn:hover{ background: rgba(255,174,0,0.16); }
-
-    .btn-danger{ border-color: rgba(255,43,106,0.35); background: rgba(255,43,106,0.10); }
-    .btn-danger:hover{ background: rgba(255,43,106,0.16); }
-
-    .btn-ghost{
-      border-color: rgba(0,243,255,0.18);
-      background: rgba(0,243,255,0.06);
-    }
-    .btn-ghost:hover{ background: rgba(0,243,255,0.10); }
-
+    .head{ padding:12px 14px; border-bottom:1px solid rgba(0,243,255,0.12); display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    h1{ margin:0; font-size:14px; letter-spacing:0.5px; }
+    .badge{ font-family:var(--mono); font-size:11px; padding:6px 10px; border-radius:999px;
+            background:rgba(0,243,255,0.12); border:1px solid rgba(0,243,255,0.18); }
+    .body{ padding:12px 14px 14px; }
     textarea{
-      width:100%;
-      min-height:360px;
-      resize:vertical;
-      border-radius:14px;
-      border:1px solid rgba(0,243,255,0.18);
-      background:rgba(6,10,22,0.75);
-      color:var(--text);
-      padding:12px;
-      font-family:var(--mono);
-      font-size:13px;
-      line-height:1.45;
-      outline:none;
+      width:100%; min-height:420px; resize:vertical; outline:none;
+      border-radius:14px; border:1px solid rgba(0,243,255,0.18);
+      background:rgba(6,10,22,0.75); color:var(--text);
+      padding:12px; font-family:var(--mono); font-size:13px; line-height:1.45;
     }
-
-    .mission{
-      background:rgba(0,243,255,0.06);
-      border:1px solid rgba(0,243,255,0.14);
-      border-radius:14px;
-      padding:12px;
-      margin-bottom:12px;
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button{
+      border-radius:12px; border:1px solid rgba(0,243,255,0.18);
+      background:rgba(8,14,30,0.7); color:var(--text);
+      padding:10px 12px; font-weight:700; cursor:pointer;
     }
-    .mission h2{
-      margin:0 0 8px 0;
-      font-size:13px;
-      letter-spacing:0.4px;
-    }
-    .mission p{
-      margin:0;
-      color:var(--muted);
-      font-size:12.5px;
-      line-height:1.35;
-    }
-
+    .btn-run{ border-color:rgba(0,255,122,0.35); background:rgba(0,255,122,0.10); }
+    .btn-run:hover{ background:rgba(0,255,122,0.16); }
+    .btn-clear{ background:rgba(0,243,255,0.06); }
+    .btn-danger{ border-color:rgba(255,43,106,0.35); background:rgba(255,43,106,0.10); }
+    .btn-danger:hover{ background:rgba(255,43,106,0.16); }
     .console{
       background:rgba(0,0,0,0.35);
       border:1px solid rgba(0,243,255,0.14);
@@ -173,343 +55,83 @@
       padding:12px;
       font-family:var(--mono);
       font-size:12.5px;
-      min-height:240px;
+      min-height:420px;
       white-space:pre-wrap;
       overflow:auto;
     }
-
-    .status{
-      font-family:var(--mono);
-      font-size:11px;
-      color:var(--muted);
-      margin-top:10px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .tip{
-      color:var(--muted);
-      font-size:12px;
-      margin-top:10px;
-      line-height:1.35;
-    }
-
-    .glow{
-      color:var(--cyan);
-      text-shadow: 0 0 12px rgba(0,243,255,0.35);
-    }
-
-    @media (max-width: 980px){
-      .wrap{ grid-template-columns:1fr; }
-      textarea{ min-height:320px; }
-    }
+    .note{ margin-top:10px; color:var(--muted); font-size:12px; line-height:1.35; }
+    @media (max-width: 980px){ .wrap{ grid-template-columns:1fr; } }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
 
-    <!-- LEFT: CODE -->
-    <div class="card">
-      <div class="head">
-        <div class="title">
-          <h1>Python Playground <span class="glow">Year 9</span> 🐍</h1>
-          <p class="sub">Pick a mission, code it, run it. Your edits are yours only.</p>
-        </div>
-        <div class="badge" id="pyStatus">Loading Python…</div>
+<div class="wrap">
+  <div class="card">
+    <div class="head">
+      <h1>Python Sandbox 🐍</h1>
+      <div class="badge" id="status">Loading Python…</div>
+    </div>
+    <div class="body">
+      <textarea id="code" spellcheck="false">print("Hello!")</textarea>
+      <div class="row">
+        <button class="btn-run" id="run">▶ Run</button>
+        <button class="btn-clear" id="clearOut">🧼 Clear output</button>
+        <button class="btn-clear" id="save">💾 Save</button>
+        <button class="btn-clear" id="load">📥 Load</button>
+        <button class="btn-danger" id="panic" title="If your code freezes the page (infinite loop), reload everything.">🧯 Panic reload</button>
       </div>
-
-      <div class="body">
-        <div class="row">
-          <label style="font-size:12px;color:var(--muted);font-weight:700">Mission pack:</label>
-          <select id="pack">
-            <option value="all">All Missions</option>
-            <option value="print">Print / Output</option>
-            <option value="input">Input</option>
-            <option value="vars">Variables</option>
-            <option value="if">If / Else / Elif</option>
-            <option value="for">For Loops</option>
-            <option value="while">While Loops</option>
-            <option value="lists">Lists</option>
-            <option value="func">Functions</option>
-          </select>
-
-          <button class="btn-ghost" id="btnRandom">🎲 Random mission</button>
-          <button class="btn-warn" id="btnReset">↩ Reset code</button>
-        </div>
-
-        <div class="mission">
-          <h2 id="missionTitle">Mission: Loading…</h2>
-          <p id="missionDesc">Stand by. Python is putting on its shoes.</p>
-        </div>
-
-        <textarea id="code" spellcheck="false"></textarea>
-
-        <div class="row" style="margin-top:12px">
-          <button class="btn-run" id="btnRun">▶ Run</button>
-          <button class="btn-ghost" id="btnClear">🧼 Clear output</button>
-          <button class="btn-danger" id="btnHardReset" title="If you get stuck in an infinite loop, this is your escape hatch.">🧯 Panic Reload</button>
-        </div>
-
-        <div class="tip">
-          Tip: If your code asks for <b>input()</b>, the sandbox will pop up a little question box.
-          If you accidentally create an infinite loop, hit <b>Panic Reload</b> 🧯
-        </div>
-
-        <div class="status">
-          <div>Autosave: <span id="saveStatus">off</span></div>
-          <div>Sandbox: <span class="glow">per-student (browser local)</span></div>
-        </div>
+      <div class="note">
+        <b>input()</b> will pop up a small question box.  
+        Save/Load stores code only in <b>this browser</b> (not shared with anyone).
       </div>
     </div>
-
-    <!-- RIGHT: OUTPUT -->
-    <div class="card">
-      <div class="head">
-        <div class="title">
-          <h1>Console Output 💬</h1>
-          <p class="sub">print() and errors appear here.</p>
-        </div>
-        <div class="badge">stdout / stderr</div>
-      </div>
-
-      <div class="body">
-        <div id="console" class="console">Loading…</div>
-        <div class="tip">
-          Challenge yourself: can you make your output match exactly what the mission asks for?
-          Computers are very picky housecats 🐈
-        </div>
-      </div>
-    </div>
-
   </div>
 
+  <div class="card">
+    <div class="head">
+      <h1>Output 💬</h1>
+      <div class="badge">stdout / stderr</div>
+    </div>
+    <div class="body">
+      <div id="console" class="console">Loading…</div>
+    </div>
+  </div>
+</div>
+
 <script>
-  // ---------- Missions (Year 9 friendly) ----------
-  const MISSIONS = [
-    // PRINT / OUTPUT
-    {
-      id:"p1", pack:"print",
-      title:"Print a greeting",
-      desc:"Make the program output: Hello, Year 9!",
-      starter:`print("Hello, Year 9!")\n`
-    },
-    {
-      id:"p2", pack:"print",
-      title:"Two lines of output",
-      desc:"Output two lines: Line 1 then Line 2.",
-      starter:`print("Line 1")\nprint("Line 2")\n`
-    },
+  const codeEl = document.getElementById("code");
+  const consoleEl = document.getElementById("console");
+  const statusEl = document.getElementById("status");
 
-    // INPUT
-    {
-      id:"i1", pack:"input",
-      title:"Ask a name",
-      desc:"Ask for a name, then output: Welcome, NAME",
-      starter:`name = input("Enter your name: ")\nprint("Welcome,", name)\n`
-    },
-
-    // VARIABLES
-    {
-      id:"v1", pack:"vars",
-      title:"Variables: points",
-      desc:"Make a variable called points with value 10, then print it.",
-      starter:`points = 10\nprint(points)\n`
-    },
-    {
-      id:"v2", pack:"vars",
-      title:"Variables + maths",
-      desc:"Ask for a number, store it, then print the number times 2.",
-      starter:`n = int(input("Enter a number: "))\nprint(n * 2)\n`
-    },
-
-    // IF / ELSE / ELIF
-    {
-      id:"if1", pack:"if",
-      title:"Odd or even (starter)",
-      desc:"Ask for an integer. If it is even, print EVEN, otherwise print ODD.",
-      starter:`n = int(input("Enter an integer: "))\n# Your if/else here\n`
-    },
-    {
-      id:"if2", pack:"if",
-      title:"Grade check (elif)",
-      desc:"Ask for a mark (0-100). Print: A (80+), B (70-79), C (60-69), D (50-59), F (below 50).",
-      starter:`mark = int(input("Enter mark (0-100): "))\n# Use if / elif / else\n`
-    },
-
-    // FOR LOOPS
-    {
-      id:"f1", pack:"for",
-      title:"Countdown with a for loop",
-      desc:"Print 5, 4, 3, 2, 1 on separate lines.",
-      starter:`for i in range(5, 0, -1):\n    print(i)\n`
-    },
-    {
-      id:"f2", pack:"for",
-      title:"Total from 1 to 10",
-      desc:"Use a for loop to add up numbers 1 to 10 and print the total.",
-      starter:`total = 0\nfor i in range(1, 11):\n    # add i to total\n\nprint(total)\n`
-    },
-
-    // WHILE LOOPS
-    {
-      id:"w1", pack:"while",
-      title:"Password gate",
-      desc:"Keep asking for a password until they type 'python'. Then print ACCESS GRANTED.",
-      starter:`pw = input("Password: ")\nwhile pw != "python":\n    pw = input("Password: ")\n\nprint("ACCESS GRANTED")\n`
-    },
-
-    // LISTS
-    {
-      id:"l1", pack:"lists",
-      title:"List basics",
-      desc:"Create a list: [3, 7, 2]. Print the first element, then the last element.",
-      starter:`nums = [3, 7, 2]\n# Print first element\n# Print last element\n`
-    },
-    {
-      id:"l2", pack:"lists",
-      title:"Sum a list",
-      desc:"Given a list of numbers, calculate the sum and print it.",
-      starter:`nums = [5, 1, 9, 2]\n# Calculate sum using a loop\n`
-    },
-
-    // FUNCTIONS
-    {
-      id:"fn1", pack:"func",
-      title:"Function: square",
-      desc:"Write a function square(n) that returns n*n. Then print square(6).",
-      starter:`def square(n):\n    # return n squared\n\nprint(square(6))\n`
-    },
-    {
-      id:"fn2", pack:"func",
-      title:"Function: greeting",
-      desc:"Write a function greet(name) that prints: Hello, NAME! Then call it with 'Aisha'.",
-      starter:`def greet(name):\n    # print a greeting\n\ngreet("Aisha")\n`
-    }
-  ];
-
-  // ---------- UI elements ----------
-  const elPack = document.getElementById("pack");
-  const elTitle = document.getElementById("missionTitle");
-  const elDesc  = document.getElementById("missionDesc");
-  const elCode  = document.getElementById("code");
-  const elConsole = document.getElementById("console");
-  const elPyStatus = document.getElementById("pyStatus");
-  const elSaveStatus = document.getElementById("saveStatus");
-
-  const btnRandom = document.getElementById("btnRandom");
-  const btnReset  = document.getElementById("btnReset");
-  const btnRun    = document.getElementById("btnRun");
-  const btnClear  = document.getElementById("btnClear");
-  const btnHardReset = document.getElementById("btnHardReset");
-
-  const STORAGE_KEY = "year9_py_sandbox_code_v1";
-  const STORAGE_MISSION = "year9_py_sandbox_mission_v1";
-
+  const STORAGE_KEY = "py_sandbox_code_v1";
   let pyodideReady = null;
-  let currentMission = null;
 
   function setConsole(text){
-    elConsole.textContent = text;
-    elConsole.scrollTop = elConsole.scrollHeight;
+    consoleEl.textContent = text;
+    consoleEl.scrollTop = consoleEl.scrollHeight;
   }
-
   function appendConsole(text){
-    elConsole.textContent += text;
-    elConsole.scrollTop = elConsole.scrollHeight;
+    consoleEl.textContent += text;
+    consoleEl.scrollTop = consoleEl.scrollHeight;
   }
 
-  function filteredMissions(){
-    const pack = elPack.value;
-    if(pack === "all") return MISSIONS;
-    return MISSIONS.filter(m => m.pack === pack);
-  }
+  async function boot(){
+    setConsole("Loading Python…");
+    statusEl.textContent = "Loading Python…";
 
-  function pickRandomMission(){
-    const list = filteredMissions();
-    return list[Math.floor(Math.random() * list.length)];
-  }
-
-  function loadMission(m, overwriteCode=true){
-    currentMission = m;
-    elTitle.textContent = "Mission: " + m.title;
-    elDesc.textContent = m.desc;
-
-    if(overwriteCode){
-      elCode.value = m.starter;
-    }
-
-    localStorage.setItem(STORAGE_MISSION, m.id);
-    saveCode();
-  }
-
-  function saveCode(){
-    localStorage.setItem(STORAGE_KEY, elCode.value);
-    elSaveStatus.textContent = "saved ✓";
-    setTimeout(() => elSaveStatus.textContent = "saved", 900);
-  }
-
-  function restoreCode(){
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if(saved !== null){
-      elCode.value = saved;
-      elSaveStatus.textContent = "restored ✓";
-      setTimeout(() => elSaveStatus.textContent = "saved", 900);
-      return true;
-    }
-    return false;
-  }
-
-  function restoreMission(){
-    const id = localStorage.getItem(STORAGE_MISSION);
-    if(!id) return null;
-    return MISSIONS.find(m => m.id === id) || null;
-  }
-
-  // Autosave as they type (lightweight)
-  let saveTimer = null;
-  elCode.addEventListener("input", () => {
-    if(saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(saveCode, 250);
-  });
-
-  elPack.addEventListener("change", () => {
-    loadMission(pickRandomMission(), true);
-  });
-
-  btnRandom.addEventListener("click", () => loadMission(pickRandomMission(), true));
-  btnReset.addEventListener("click", () => {
-    if(!currentMission) return;
-    elCode.value = currentMission.starter;
-    saveCode();
-  });
-
-  btnClear.addEventListener("click", () => setConsole(""));
-
-  btnHardReset.addEventListener("click", () => {
-    // Escape hatch for infinite loops: reload the iframe/page.
-    location.reload();
-  });
-
-  // ---------- Python runtime ----------
-  async function bootPyodide(){
-    elPyStatus.textContent = "Loading Python…";
     pyodideReady = loadPyodide();
     const py = await pyodideReady;
 
-    // Wire Python stdout/stderr to our console.
+    // Hook stdout / stderr
     py.setStdout({ batched: (s) => appendConsole(s) });
     py.setStderr({ batched: (s) => appendConsole(s) });
 
-    // Provide a friendly input() using browser prompt.
+    // Friendly input() via prompt
     py.globals.set("js_input", (msg) => {
       const ans = prompt(msg || "Input:");
       return ans === null ? "" : ans;
     });
 
-    // Patch input() in Python to call js_input
     await py.runPythonAsync(`
 import builtins
 def _patched_input(prompt=""):
@@ -517,50 +139,39 @@ def _patched_input(prompt=""):
 builtins.input = _patched_input
 `);
 
-    elPyStatus.textContent = "Python ready ✓";
-    return py;
+    statusEl.textContent = "Python ready ✓";
+    setConsole("Python ready. Type code and press Run! 🐍\n");
   }
 
-  btnRun.addEventListener("click", async () => {
-    setConsole(""); // clear each run
-    appendConsole("▶ Running…\n\n");
-
+  document.getElementById("run").addEventListener("click", async () => {
+    setConsole("▶ Running…\n\n");
     try{
       const py = await pyodideReady;
-
-      // Wrap user code so we can show a nicer traceback label
-      const userCode = elCode.value;
-
-      // A tiny safety note: true infinite loops can freeze the tab.
-      // Students can hit Panic Reload if needed.
-      await py.runPythonAsync(userCode);
-
+      await py.runPythonAsync(codeEl.value);
       appendConsole("\n\n✅ Done.");
     }catch(err){
       appendConsole("\n\n❌ Error:\n" + err);
     }
   });
 
-  // ---------- Start ----------
-  (async function init(){
-    setConsole("Loading Python…");
+  document.getElementById("clearOut").addEventListener("click", () => setConsole(""));
 
-    // choose mission: restore last mission if possible
-    let m = restoreMission() || pickRandomMission();
-    loadMission(m, true);
+  document.getElementById("save").addEventListener("click", () => {
+    localStorage.setItem(STORAGE_KEY, codeEl.value);
+    statusEl.textContent = "Saved ✓";
+    setTimeout(() => statusEl.textContent = "Python ready ✓", 900);
+  });
 
-    // restore student code (if they had one)
-    const hadSaved = restoreCode();
-    if(!hadSaved){
-      elSaveStatus.textContent = "saved";
-    }else{
-      elSaveStatus.textContent = "saved";
-    }
+  document.getElementById("load").addEventListener("click", () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved !== null) codeEl.value = saved;
+    statusEl.textContent = saved ? "Loaded ✓" : "Nothing saved";
+    setTimeout(() => statusEl.textContent = "Python ready ✓", 900);
+  });
 
-    // boot python
-    await bootPyodide();
-    setConsole("Python ready. Pick a mission and hit Run! 🐍\n");
-  })();
+  document.getElementById("panic").addEventListener("click", () => location.reload());
+
+  boot();
 </script>
 
 </body>
