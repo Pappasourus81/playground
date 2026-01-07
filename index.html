@@ -236,11 +236,16 @@ def _stdin_input(prompt=""):
     if _stdin_i < len(_stdin_lines):
         s = _stdin_lines[_stdin_i]
         _stdin_i += 1
+        print()  # force newline after input
         return s
+    print()
     return ""
+
 builtins.input = _stdin_input
 `);
       await py.runPythonAsync(cleaned);
+      stdinEl.value = "";
+
     }catch(err){
       appendConsole("\\n" + err);
     }
