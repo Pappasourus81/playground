@@ -135,7 +135,7 @@
       font-family:var(--mono);
       font-size:12.5px;
       min-height:560px;
-      white-space:pre-wrap;
+      white-space:pre-wrap; /* IMPORTANT for line breaks */
       overflow:auto;
     }
     @media (max-width: 980px){ .console{min-height:360px} }
@@ -187,6 +187,7 @@
   const stdinEl = document.getElementById("stdin");
   const consoleEl = document.getElementById("console");
   const statusEl = document.getElementById("status");
+  const runBtn = document.getElementById("run");
 
   const DEFAULT_CODE = `print("Hello, world!")`;
   const DEFAULT_IN = ``;
@@ -208,46 +209,77 @@
     statusEl.textContent = "Ready ✓";
   }
 
-  document.getElementById("run").addEventListener("click", async () => {
+  runBtn.addEventListener("click", async () => {
+    // always clear output each run
     setConsole("");
 
-    // Fix curly quotes if pasted from Docs etc.
-    const cleaned = codeEl.value
+    // grab input, then CLEAR the box immediately (your requirement)
+    const rawInput = stdinEl.value;
+    stdinEl.value = "";
+
+    // clean smart quotes
+    const cleanedCode = codeEl.value
       .replace(/[“”]/g, '"')
       .replace(/[‘’]/g, "'");
 
-    // Input lines (one per input())
-    const raw = stdinEl.value.replace(/\r/g, "");
+    // parse stdin lines (one per input())
+    const raw = rawInput.replace(/\r/g, "");
     const lines = raw.length ? raw.split("\n") : [];
     const jsLines = JSON.stringify(lines);
+
+    // disable run while executing (prevents double-runs)
+    runBtn.disabled = true;
+    statusEl.textContent = "Running…";
 
     try{
       const py = await pyodideReady;
 
-      // Patch input() for this run to read from INPUT box
+      // Patch input() AND force print() to always end with newline
       await py.runPythonAsync(`
 import builtins
+
+# Keep a reference to the original print (so prompts can stay inline)
+_orig_print = builtins.print
+
 _stdin_lines = ${jsLines}
 _stdin_i = 0
+
 def _stdin_input(prompt=""):
     global _stdin_i
+    # show prompt inline
     if prompt:
-        print(prompt, end="")
+        _orig_print(prompt, end="")
+    # consume next line
     if _stdin_i < len(_stdin_lines):
         s = _stdin_lines[_stdin_i]
         _stdin_i += 1
-        print()  # force newline after input
+        # echo the typed input + newline (so output looks like a real console)
+        _orig_print(s)
         return s
-    print()
+    _orig_print("")
     return ""
 
-builtins.input = _stdin_input
-`);
-      await py.runPythonAsync(cleaned);
-      stdinEl.value = "";
+def _println(*args, **kwargs):
+    # Force newline always (println behaviour)
+    # Ignore any custom 'end' from user code
+    if "end" in kwargs:
+        kwargs.pop("end", None)
+    _orig_print(*args, end="\\n", **kwargs)
 
+builtins.input = _stdin_input
+builtins.print = _println
+`);
+
+      await py.runPythonAsync(cleanedCode);
+
+      statusEl.textContent = "Done ✓";
     }catch(err){
-      appendConsole("\\n" + err);
+      appendConsole(String(err));
+      statusEl.textContent = "Error";
+    }finally{
+      runBtn.disabled = false;
+      // after a short moment, return badge to Ready
+      setTimeout(() => { statusEl.textContent = "Ready ✓"; }, 700);
     }
   });
 
