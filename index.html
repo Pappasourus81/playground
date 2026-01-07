@@ -203,42 +203,41 @@
     pyodideReady = loadPyodide();
     const py = await pyodideReady;
 
-    py.setStdout({ batched: (s) => appendConsole(s) });
-    py.setStderr({ batched: (s) => appendConsole(s) });
+    const outChunk = (s) => {
+      s = String(s).replace(/\r\n?/g, "\n");
+      if (s.length && !s.endsWith("\n")) s += "\n";
+      appendConsole(s);
+    };
+
+    py.setStdout({ batched: outChunk });
+    py.setStderr({ batched: outChunk });
 
     statusEl.textContent = "Ready ✓";
   }
 
   runBtn.addEventListener("click", async () => {
-    // always clear output each run
     setConsole("");
 
-    // grab input, then CLEAR the box immediately (your requirement)
     const rawInput = stdinEl.value;
-    stdinEl.value = "";
+    stdinEl.value = ""; // clear input box immediately
 
-    // clean smart quotes
     const cleanedCode = codeEl.value
       .replace(/[“”]/g, '"')
       .replace(/[‘’]/g, "'");
 
-    // parse stdin lines (one per input())
     const raw = rawInput.replace(/\r/g, "");
     const lines = raw.length ? raw.split("\n") : [];
     const jsLines = JSON.stringify(lines);
 
-    // disable run while executing (prevents double-runs)
     runBtn.disabled = true;
     statusEl.textContent = "Running…";
 
     try{
       const py = await pyodideReady;
 
-      // Patch input() AND force print() to always end with newline
       await py.runPythonAsync(`
 import builtins
 
-# Keep a reference to the original print (so prompts can stay inline)
 _orig_print = builtins.print
 
 _stdin_lines = ${jsLines}
@@ -246,22 +245,16 @@ _stdin_i = 0
 
 def _stdin_input(prompt=""):
     global _stdin_i
-    # show prompt inline
     if prompt:
         _orig_print(prompt, end="")
-    # consume next line
     if _stdin_i < len(_stdin_lines):
         s = _stdin_lines[_stdin_i]
         _stdin_i += 1
-        # echo the typed input + newline (so output looks like a real console)
-        _orig_print(s)
+        _orig_print(s)   # echo entered value on its own line
         return s
-    _orig_print("")
-    return ""
+    raise EOFError("No input provided")
 
 def _println(*args, **kwargs):
-    # Force newline always (println behaviour)
-    # Ignore any custom 'end' from user code
     if "end" in kwargs:
         kwargs.pop("end", None)
     _orig_print(*args, end="\\n", **kwargs)
@@ -278,7 +271,6 @@ builtins.print = _println
       statusEl.textContent = "Error";
     }finally{
       runBtn.disabled = false;
-      // after a short moment, return badge to Ready
       setTimeout(() => { statusEl.textContent = "Ready ✓"; }, 700);
     }
   });
@@ -293,10 +285,10 @@ builtins.print = _println
 
   document.getElementById("panic").addEventListener("click", () => location.reload());
 
-  // start
   codeEl.value = DEFAULT_CODE;
   stdinEl.value = DEFAULT_IN;
   boot();
 </script>
+
 </body>
 </html>
