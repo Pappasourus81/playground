@@ -5,49 +5,128 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Python Sandbox</title>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+
   <style>
     :root{
-      --bg:#070b16; --panel:#0c1430; --text:#d6ecff; --muted:#93b6d3;
-      --cyan:#00f3ff; --green:#00ff7a; --red:#ff2b6a;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
-      --ui: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      --bg:#050a14;
+      --panel:#0a1122;
+      --panel2:#081022;
+      --text:#d6ecff;
+      --muted:#8fb7d7;
+
+      --cyan:#00f3ff;
+      --amber:#ffae00;
+      --green:#00ff7a;
+      --red:#ff2b6a;
+      --purple:#b46bff;
+
       --radius:16px;
+      --mono: ui-monospace, Consolas, "Courier New", monospace;
+      --ui: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
+
+    *{box-sizing:border-box}
     body{
-      margin:0; padding:18px; color:var(--text); font-family:var(--ui);
-      background: radial-gradient(900px 600px at 15% 10%, rgba(0,243,255,0.16), transparent 55%),
-                  linear-gradient(180deg, #050816 0%, var(--bg) 70%, #050816 100%);
+      margin:0;
+      background:linear-gradient(180deg,#040812,#050a14);
+      color:var(--text);
+      font-family:var(--ui);
+      padding:18px;
     }
-    .wrap{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+    .wrap{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.1fr 0.9fr;gap:14px}
+    @media (max-width: 980px){ .wrap{grid-template-columns:1fr} }
+
     .card{
-      background:rgba(12,20,48,0.9);
+      background:linear-gradient(180deg,rgba(10,17,34,0.92),rgba(8,16,34,0.92));
       border:1px solid rgba(0,243,255,0.18);
       border-radius:var(--radius);
-      box-shadow:0 10px 28px rgba(0,0,0,0.35);
+      box-shadow:0 12px 30px rgba(0,0,0,0.35);
       overflow:hidden;
     }
-    .head{ padding:12px 14px; border-bottom:1px solid rgba(0,243,255,0.12); display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    h1{ margin:0; font-size:14px; letter-spacing:0.5px; }
-    .badge{ font-family:var(--mono); font-size:11px; padding:6px 10px; border-radius:999px;
-            background:rgba(0,243,255,0.12); border:1px solid rgba(0,243,255,0.18); }
-    .body{ padding:12px 14px 14px; }
+
+    .head{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(0,243,255,0.12);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .title{
+      margin:0;
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:0.5px;
+    }
+
+    .badge{
+      font-family:var(--mono);
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(0,243,255,0.10);
+      border:1px solid rgba(0,243,255,0.18);
+      color:var(--text);
+      white-space:nowrap;
+    }
+
+    .body{padding:14px}
+
+    .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+      letter-spacing:0.4px;
+      margin:0 0 8px 0;
+    }
+
     textarea{
-      width:100%; min-height:420px; resize:vertical; outline:none;
-      border-radius:14px; border:1px solid rgba(0,243,255,0.18);
-      background:rgba(6,10,22,0.75); color:var(--text);
-      padding:12px; font-family:var(--mono); font-size:13px; line-height:1.45;
+      width:100%;
+      resize:vertical;
+      border-radius:14px;
+      border:1px solid rgba(0,243,255,0.18);
+      background:rgba(6,10,22,0.75);
+      color:var(--text);
+      padding:12px;
+      font-family:var(--mono);
+      font-size:13px;
+      line-height:1.45;
+      outline:none;
     }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+    #code{min-height:420px}
+    #stdin{min-height:92px}
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
     button{
-      border-radius:12px; border:1px solid rgba(0,243,255,0.18);
-      background:rgba(8,14,30,0.7); color:var(--text);
-      padding:10px 12px; font-weight:700; cursor:pointer;
+      border-radius:12px;
+      border:1px solid rgba(0,243,255,0.18);
+      background:rgba(8,14,30,0.7);
+      color:var(--text);
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      transition: transform 0.05s ease, background 0.2s ease, border-color 0.2s ease;
     }
-    .btn-run{ border-color:rgba(0,255,122,0.35); background:rgba(0,255,122,0.10); }
-    .btn-run:hover{ background:rgba(0,255,122,0.16); }
-    .btn-clear{ background:rgba(0,243,255,0.06); }
-    .btn-danger{ border-color:rgba(255,43,106,0.35); background:rgba(255,43,106,0.10); }
-    .btn-danger:hover{ background:rgba(255,43,106,0.16); }
+    button:active{ transform: translateY(1px); }
+
+    .btn-run{ border-color: rgba(0,255,122,0.35); background: rgba(0,255,122,0.10); }
+    .btn-run:hover{ background: rgba(0,255,122,0.16); }
+
+    .btn-ghost{ background: rgba(0,243,255,0.06); }
+    .btn-ghost:hover{ background: rgba(0,243,255,0.10); }
+
+    .btn-danger{ border-color: rgba(255,43,106,0.35); background: rgba(255,43,106,0.10); }
+    .btn-danger:hover{ background: rgba(255,43,106,0.16); }
+
     .console{
       background:rgba(0,0,0,0.35);
       border:1px solid rgba(0,243,255,0.14);
@@ -55,124 +134,132 @@
       padding:12px;
       font-family:var(--mono);
       font-size:12.5px;
-      min-height:420px;
+      min-height:560px;
       white-space:pre-wrap;
       overflow:auto;
     }
-    .note{ margin-top:10px; color:var(--muted); font-size:12px; line-height:1.35; }
-    @media (max-width: 980px){ .wrap{ grid-template-columns:1fr; } }
+    @media (max-width: 980px){ .console{min-height:360px} }
   </style>
 </head>
+
 <body>
+  <div class="wrap">
 
-<div class="wrap">
-  <div class="card">
-    <div class="head">
-      <h1>Python Sandbox 🐍</h1>
-      <div class="badge" id="status">Loading Python…</div>
-    </div>
-    <div class="body">
-      <textarea id="code" spellcheck="false">print("Hello!")</textarea>
-      <div class="row">
-        <button class="btn-run" id="run">▶ Run</button>
-        <button class="btn-clear" id="clearOut">🧼 Clear output</button>
-        <button class="btn-clear" id="save">💾 Save</button>
-        <button class="btn-clear" id="load">📥 Load</button>
-        <button class="btn-danger" id="panic" title="If your code freezes the page (infinite loop), reload everything.">🧯 Panic reload</button>
+    <!-- LEFT -->
+    <div class="card">
+      <div class="head">
+        <div class="title">Python Sandbox</div>
+        <div class="badge" id="status">Loading…</div>
       </div>
-      <div class="note">
-        <b>input()</b> will pop up a small question box.  
-        Save/Load stores code only in <b>this browser</b> (not shared with anyone).
-      </div>
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="head">
-      <h1>Output 💬</h1>
-      <div class="badge">stdout / stderr</div>
+      <div class="body">
+        <div class="label">CODE</div>
+        <textarea id="code" spellcheck="false"></textarea>
+
+        <div class="label" style="margin-top:12px;">INPUT</div>
+        <textarea id="stdin" spellcheck="false"></textarea>
+
+        <div class="row">
+          <button class="btn-run" id="run">RUN</button>
+          <button class="btn-ghost" id="clearOut">CLEAR OUTPUT</button>
+          <button class="btn-ghost" id="reset">RESET</button>
+          <button class="btn-danger" id="panic" title="Reload sandbox">PANIC</button>
+        </div>
+      </div>
     </div>
-    <div class="body">
-      <div id="console" class="console">Loading…</div>
+
+    <!-- RIGHT -->
+    <div class="card">
+      <div class="head">
+        <div class="title">OUTPUT</div>
+        <div class="badge">stdout / stderr</div>
+      </div>
+
+      <div class="body">
+        <div id="console" class="console"></div>
+      </div>
     </div>
+
   </div>
-</div>
 
 <script>
   const codeEl = document.getElementById("code");
+  const stdinEl = document.getElementById("stdin");
   const consoleEl = document.getElementById("console");
   const statusEl = document.getElementById("status");
 
-  const STORAGE_KEY = "py_sandbox_code_v1";
+  const DEFAULT_CODE = `print("Hello, world!")`;
+  const DEFAULT_IN = ``;
+
   let pyodideReady = null;
 
-  function setConsole(text){
-    consoleEl.textContent = text;
-    consoleEl.scrollTop = consoleEl.scrollHeight;
-  }
-  function appendConsole(text){
-    consoleEl.textContent += text;
-    consoleEl.scrollTop = consoleEl.scrollHeight;
-  }
+  function setConsole(t){ consoleEl.textContent = t; consoleEl.scrollTop = consoleEl.scrollHeight; }
+  function appendConsole(t){ consoleEl.textContent += t; consoleEl.scrollTop = consoleEl.scrollHeight; }
 
   async function boot(){
-    setConsole("Loading Python…");
-    statusEl.textContent = "Loading Python…";
-
+    setConsole("");
+    statusEl.textContent = "Loading…";
     pyodideReady = loadPyodide();
     const py = await pyodideReady;
 
-    // Hook stdout / stderr
     py.setStdout({ batched: (s) => appendConsole(s) });
     py.setStderr({ batched: (s) => appendConsole(s) });
 
-    // Friendly input() via prompt
-    py.globals.set("js_input", (msg) => {
-      const ans = prompt(msg || "Input:");
-      return ans === null ? "" : ans;
-    });
-
-    await py.runPythonAsync(`
-import builtins
-def _patched_input(prompt=""):
-    return js_input(prompt)
-builtins.input = _patched_input
-`);
-
-    statusEl.textContent = "Python ready ✓";
-    setConsole("Python ready. Type code and press Run! 🐍\n");
+    statusEl.textContent = "Ready ✓";
   }
 
   document.getElementById("run").addEventListener("click", async () => {
-    setConsole("▶ Running…\n\n");
+    setConsole("");
+
+    // Fix curly quotes if pasted from Docs etc.
+    const cleaned = codeEl.value
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'");
+
+    // Input lines (one per input())
+    const raw = stdinEl.value.replace(/\r/g, "");
+    const lines = raw.length ? raw.split("\n") : [];
+    const jsLines = JSON.stringify(lines);
+
     try{
       const py = await pyodideReady;
-      await py.runPythonAsync(codeEl.value);
-      appendConsole("\n\n✅ Done.");
+
+      // Patch input() for this run to read from INPUT box
+      await py.runPythonAsync(`
+import builtins
+_stdin_lines = ${jsLines}
+_stdin_i = 0
+def _stdin_input(prompt=""):
+    global _stdin_i
+    if prompt:
+        print(prompt, end="")
+    if _stdin_i < len(_stdin_lines):
+        s = _stdin_lines[_stdin_i]
+        _stdin_i += 1
+        return s
+    return ""
+builtins.input = _stdin_input
+`);
+      await py.runPythonAsync(cleaned);
     }catch(err){
-      appendConsole("\n\n❌ Error:\n" + err);
+      appendConsole("\\n" + err);
     }
   });
 
   document.getElementById("clearOut").addEventListener("click", () => setConsole(""));
 
-  document.getElementById("save").addEventListener("click", () => {
-    localStorage.setItem(STORAGE_KEY, codeEl.value);
-    statusEl.textContent = "Saved ✓";
-    setTimeout(() => statusEl.textContent = "Python ready ✓", 900);
-  });
-
-  document.getElementById("load").addEventListener("click", () => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if(saved !== null) codeEl.value = saved;
-    statusEl.textContent = saved ? "Loaded ✓" : "Nothing saved";
-    setTimeout(() => statusEl.textContent = "Python ready ✓", 900);
+  document.getElementById("reset").addEventListener("click", () => {
+    codeEl.value = DEFAULT_CODE;
+    stdinEl.value = DEFAULT_IN;
+    setConsole("");
   });
 
   document.getElementById("panic").addEventListener("click", () => location.reload());
 
+  // start
+  codeEl.value = DEFAULT_CODE;
+  stdinEl.value = DEFAULT_IN;
   boot();
 </script>
-
 </body>
 </html>
