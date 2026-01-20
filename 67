@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full Screen Wobble</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #05060a;
+      color: #e9f0ff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Full-viewport stage (the thing that wobbles) */
+    .stage {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      transform-origin: 50% 50%;
+      will-change: transform, filter;
+      animation: wobbleHands 3.8s ease-in-out infinite;
+      filter: blur(0px);
+    }
+
+    /* Optional: a little vignette + grain to sell the motion */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,0.02),
+          rgba(255,255,255,0.02) 1px,
+          rgba(0,0,0,0) 2px,
+          rgba(0,0,0,0) 6px
+        );
+      mix-blend-mode: overlay;
+      opacity: 0.35;
+    }
+
+    /* Your content sits inside here */
+    .content {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      width: min(860px, 92vw);
+      border-radius: 24px;
+      padding: 28px;
+      background: rgba(20, 25, 40, 0.68);
+      border: 1px solid rgba(140, 170, 255, 0.22);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.55);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: clamp(22px, 3.2vw, 36px);
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      margin: 0 0 18px 0;
+      line-height: 1.45;
+      opacity: 0.92;
+      font-size: clamp(14px, 1.7vw, 18px);
+    }
+
+    .btnRow {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      background: rgba(110, 150, 255, 0.95);
+      color: #0b1020;
+      box-shadow: 0 14px 40px rgba(90, 140, 255, 0.35);
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.10);
+      color: #e9f0ff;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: none;
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 13px;
+      opacity: 0.75;
+    }
+
+    /* The slow, pronounced wobble */
+    @keyframes wobbleHands {
+      0%   { transform: translate(0px, 0px) rotate(0deg)     scale(1.02); filter: blur(0px); }
+      12%  { transform: translate(-14px, 10px) rotate(-2.4deg) scale(1.05); filter: blur(0.35px); }
+      25%  { transform: translate(16px, 6px)  rotate(2.8deg)  scale(1.06); filter: blur(0.6px); }
+      38%  { transform: translate(-18px, -10px) rotate(-3.2deg) scale(1.07); filter: blur(0.75px); }
+      50%  { transform: translate(18px, -12px) rotate(3.0deg) scale(1.06); filter: blur(0.6px); }
+      62%  { transform: translate(-10px, 14px) rotate(-2.0deg) scale(1.05); filter: blur(0.45px); }
+      75%  { transform: translate(10px, -8px) rotate(1.8deg)  scale(1.04); filter: blur(0.3px); }
+      88%  { transform: translate(-6px, 8px)  rotate(-1.2deg) scale(1.03); filter: blur(0.2px); }
+      100% { transform: translate(0px, 0px)  rotate(0deg)     scale(1.02); filter: blur(0px); }
+    }
+
+    /* Respect reduced motion (nice for accessibility) */
+    @media (prefers-reduced-motion: reduce) {
+      .stage { animation: none !important; transform: none !important; filter: none !important; }
+    }
+
+    /* When disabled */
+    .off .stage { animation: none !important; transform: none !important; filter: none !important; }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <div class="stage" id="stage">
+      <div class="content">
+        <div class="card">
+          <h1>Wobble Mode: ON</h1>
+          <p>
+            Everything inside this embed is wobbling slowly and strongly.
+            If you’re using this as an “effect page”, replace this card with your activity/game.
+          </p>
+
+          <div class="btnRow">
+            <button id="toggleBtn">DISABLE WOBBLE</button>
+            <button class="secondary" id="intensifyBtn">MAKE IT EVEN STRONGER</button>
+          </div>
+
+          <div class="note">
+            Tip: If this makes students dizzy, keep the button visible. Also: Google Sites can only wobble the embed area, not the whole parent page.
+          </div>
+        </div>
+      </div>
+
+      <div class="vignette"></div>
+    </div>
+  </div>
+
+  <script>
+    const root = document.getElementById("root");
+    const stage = document.getElementById("stage");
+    const toggleBtn = document.getElementById("toggleBtn");
+    const intensifyBtn = document.getElementById("intensifyBtn");
+
+    let wobbleOn = true;
+    let extra = false;
+
+    toggleBtn.addEventListener("click", () => {
+      wobbleOn = !wobbleOn;
+      root.classList.toggle("off", !wobbleOn);
+      toggleBtn.textContent = wobbleOn ? "DISABLE WOBBLE" : "ENABLE WOBBLE";
+      document.querySelector("h1").textContent = wobbleOn ? "Wobble Mode: ON" : "Wobble Mode: OFF";
+    });
+
+    intensifyBtn.addEventListener("click", () => {
+      extra = !extra;
+
+      // Swap animation settings without needing extra CSS keyframes
+      if (extra) {
+        stage.style.animationDuration = "3.2s";   // slightly faster
+        stage.style.animationTimingFunction = "ease-in-out";
+        stage.style.filter = "blur(0.2px)";
+        intensifyBtn.textContent = "BACK TO NORMAL STRONG";
+      } else {
+        stage.style.animationDuration = "3.8s";   // slower
+        stage.style.filter = "";
+        intensifyBtn.textContent = "MAKE IT EVEN STRONGER";
+      }
+    });
+  </script>
+</body>
+</html>
